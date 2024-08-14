@@ -50,7 +50,7 @@ export class AuthService {
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     }
   }
   async signupUser(signupUserDto: SignupUserDto) {
@@ -77,13 +77,14 @@ export class AuthService {
       this.mail.sendMail(email, 'Token', number)
 
       return {
+        status: HttpStatus.OK,
         sendOtp: true,
         newAdmin: newUser
       }
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     }
   }
 
@@ -110,13 +111,14 @@ export class AuthService {
       this.mail.sendMail(email, 'Token', number)
 
       return {
+        status: HttpStatus.OK,
         sendOtp: true,
         newAdmin: newUser
       }
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     }
   }
 
@@ -125,21 +127,127 @@ export class AuthService {
     try {
 
       const validUser = await this.validateUser(signinDto.email, signinDto.password, role);
+      const { access, refresh } = await this.refreshTokenFunc(signinDto.email, role);
 
-      const payload = { email: validUser.email, role: role };
-
-      const access = this.jwtservice.sign(payload, { secret: process.env.ACCESS_KEY, expiresIn: process.env.ACCESS_EXPIRE_TIME })
-      const refresh = this.jwtservice.sign(payload, { secret: process.env.REFRESH_KEY, expiresIn: process.env.REFRESH_EXPIRE_TIME })
-
-      this.refreshTokenFunc(refresh, validUser);
       return {
+        status: HttpStatus.OK,
         accessToken: access,
         refreshToken: refresh
       }
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     }
+  }
+
+
+  async refreshTokenFunc(email: string, role: string) {
+
+    const payload = { email: email, role: role };
+    const access = this.jwtservice.sign(payload, { secret: process.env.ACCESS_KEY, expiresIn: process.env.ACCESS_EXPIRE_TIME })
+    const refresh = this.jwtservice.sign(payload, { secret: process.env.REFRESH_KEY, expiresIn: process.env.REFRESH_EXPIRE_TIME })
+
+    const dbrefresh = await this.prisma.refreshTokens.findFirst({
+      where: { email: email }
+    });
+
+    if (dbrefresh) {
+      const updateRefresh = await this.prisma.refreshTokens.update({
+        data: { token: refresh },
+        where: { id: dbrefresh.id }
+      });
+
+    } else {
+      const newRefresh = await this.prisma.refreshTokens.create({
+        data: { email: email, token: refresh }
+      });
+
+    }
+    return { access, refresh }
+  }
+
+
+  async verify(otpDto: OtpDto, role: string) {
+    try {
+      const otp = await this.prisma.otps.findFirst({ where: { email: otpDto.email } });
+
+      if (otp.otp === otpDto.otp) {
+        if (role === 'user') {
+          const user = await this.prisma.users.findFirst({ where: { email: otp.email } })
+          await this.prisma.otps.delete({ where: { id: otp.id } });
+          await this.prisma.users.update({
+            data: { status: "active" },
+            where: { id: user.id }
+          });
+          return { message: "Verifyed", status: HttpStatus.OK, }
+
+        } else if (role === 'admin') {
+          const user = await this.prisma.admins.findFirst({ where: { email: otp.email } })
+          await this.prisma.otps.delete({ where: { id: otp.id } });
+          await this.prisma.admins.update({
+            data: { status: "active" },
+            where: { id: user.id }
+          });
+          return { message: "Verifyed", status: HttpStatus.OK, }
+
+        } else if (role === 'driver') {
+          const user = await this.prisma.drivers.findFirst({ where: { email: otp.email } })
+          await this.prisma.otps.delete({ where: { id: otp.id } });
+          await this.prisma.drivers.update({
+            data: { status: "active" },
+            where: { id: user.id }
+          });
+          return { message: "Verifyed", status: HttpStatus.OK, }
+        }
+      }
+      throw new BadRequestException("Invalid Otp")
+
+    } catch (e) {
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
+    }
+  }
+
+
+
+  async getProfile(email: string, role: string) {
+    try {
+
+      if (role === 'user') {
+        const user = await this.prisma.users.findFirst({ where: { email: email } });
+        if (!user) {
+          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
+        }
+        const { password, ...result } = user
+        return {status: HttpStatus.OK, result}
+
+      } else if (role === 'admin') {
+        const user = await this.prisma.admins.findFirst({ where: { email: email } });
+        if (!user) {
+          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
+        }
+        const { password, ...result } = user
+        return {status: HttpStatus.OK, result}
+
+      } else if (role === 'driver') {
+        const user = await this.prisma.drivers.findFirst({ where: { email: email } });
+        if (!user) {
+          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
+        }
+        const { password, ...result } = user
+        return {status: HttpStatus.OK, result}
+
+      }
+
+    } catch (e) {
+      console.log(e);
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
+    }
+  }
+
+
+  async refreshToken(user, role) {
+    const { access, refresh } = await this.refreshTokenFunc(user, role);
+    return { accresToken: access };
   }
 
 
@@ -161,106 +269,6 @@ export class AuthService {
     if (user && (await this.hash.comparePasswords(pass, user.password))) {
       return user;
     }
-    return null;
+    return undefined;
   }
-
-
-  async refreshTokenFunc(refreshToken: string, validUser) {
-
-    const dbrefresh = await this.prisma.refreshTokens.findFirst({
-      where: { email: validUser.email }
-    });
-
-    if (dbrefresh) {
-      const updateRefresh = await this.prisma.refreshTokens.update({
-        data: { token: refreshToken },
-        where: { id: dbrefresh.id }
-      });
-
-    } else {
-      const newRefresh = await this.prisma.refreshTokens.create({
-        data: { email: validUser.email, token: refreshToken }
-      });
-    }
-  }
-
-
-  async verify(otpDto: OtpDto, role: string) {
-    try {
-      const otp = await this.prisma.otps.findFirst({ where: { email: otpDto.email } });
-
-      if (otp.otp === otpDto.otp) {
-        if (role === 'user') {
-          const user = await this.prisma.users.findFirst({ where: { email: otp.email } })
-          await this.prisma.otps.delete({ where: { id: otp.id } });
-          await this.prisma.users.update({
-            data: { status: "active" },
-            where: { id: user.id }
-          });
-          return { message: "Verifyed" }
-
-        } else if (role === 'admin') {
-          const user = await this.prisma.admins.findFirst({ where: { email: otp.email } })
-          await this.prisma.otps.delete({ where: { id: otp.id } });
-          await this.prisma.admins.update({
-            data: { status: "active" },
-            where: { id: user.id }
-          });
-          return { message: "Verifyed" }
-
-        } else if (role === 'driver') {
-          const user = await this.prisma.drivers.findFirst({ where: { email: otp.email } })
-          await this.prisma.otps.delete({ where: { id: otp.id } });
-          await this.prisma.drivers.update({
-            data: { status: "active" },
-            where: { id: user.id }
-          });
-          return { message: "Verifyed" }
-        }
-      }
-      throw new BadRequestException("Invalid Otp")
-
-    } catch (error) {
-      throw new HttpException("Invalid otp", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-
-
-  async getProfile(email: string, role: string) {
-    try {
-
-      if (role === 'user') {
-        const user = await this.prisma.users.findFirst({ where: { email: email } });
-        if (!user) {
-          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
-        }
-        const { password, ...result } = user
-        return result
-
-      } else if (role === 'admin') {
-        const user = await this.prisma.admins.findFirst({ where: { email: email } });
-        if (!user) {
-          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
-        }
-        const { password, ...result } = user
-        return result
-
-      } else if (role === 'driver') {
-        const user = await this.prisma.drivers.findFirst({ where: { email: email } });
-        if (!user) {
-          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
-        }
-        const { password, ...result } = user
-        return result
-        
-      }
-      return undefined;
-
-    } catch (e) {
-      console.log(e);
-      return { error: e }
-    }
-  }
-
 }

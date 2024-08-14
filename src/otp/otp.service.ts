@@ -13,7 +13,7 @@ export class OtpService {
       return otps
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -29,7 +29,7 @@ export class OtpService {
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     }
   }
 }

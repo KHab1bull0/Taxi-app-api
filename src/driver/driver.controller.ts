@@ -9,11 +9,11 @@ import { RolesGuard } from 'src/auth/common/guards/role.guard';
 
 @Controller('driver')
 export class DriverController {
-  constructor(private readonly driverService: DriverService) {}
+  constructor(private readonly driverService: DriverService) { }
 
   @Get("all")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Driver, Role.Admin)
+  @Roles(Role.Admin)
   findAll() {
     return this.driverService.findAll();
   }

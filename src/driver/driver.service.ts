@@ -14,7 +14,7 @@ export class DriverService {
       return await this.prisma.drivers.findMany();
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -28,7 +28,7 @@ export class DriverService {
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -44,7 +44,7 @@ export class DriverService {
       return { message: "Driver updated", newUser: newUser };
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -61,7 +61,7 @@ export class DriverService {
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 }

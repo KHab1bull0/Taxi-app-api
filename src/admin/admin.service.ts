@@ -11,7 +11,8 @@ export class AdminService {
 
   async findAll() {
     try {
-      return await this.prisma.admins.findMany();
+      const admin =  await this.prisma.admins.findMany();
+      return {status: HttpStatus.OK, admin}
     } catch (e) {
       console.log(e);
       return { error: e }
@@ -24,7 +25,7 @@ export class AdminService {
       if (!admin) {
         return { message: "ADMIN not found", status: HttpStatus.NOT_FOUND };
       }
-      return admin
+      return {status: HttpStatus.OK, admin}
     } catch (e) {
       console.log(e);
       return { error: e }
@@ -39,7 +40,7 @@ export class AdminService {
       }
 
       const newUser = await this.prisma.admins.update({ data: updateUserDto, where: { id: id } });
-      return { message: "ADMIN updated", newUser: newUser };
+      return { message: "ADMIN updated", status: HttpStatus.OK, newUser: newUser };
     } catch (e) {
       console.log(e);
       return { error: e }
@@ -54,7 +55,7 @@ export class AdminService {
       }
 
       const deleteUser = await this.prisma.admins.delete({ where: { id: id } });
-      return { message: "ADMIN deleted", deletedUser: deleteUser };
+      return { message: "ADMIN deleted", status: HttpStatus.OK, deletedUser: deleteUser };
 
     } catch (e) {
       console.log(e);

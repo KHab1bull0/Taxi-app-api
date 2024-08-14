@@ -8,6 +8,7 @@ import { OtpService } from 'src/helper/otp.service';
 import { JwtService } from '@nestjs/jwt';
 import { AccessTokenStrategy } from './common/strategies';
 import { PassportModule } from '@nestjs/passport';
+import { RefreshtokenService } from 'src/refreshtoken/refreshtoken.service';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PassportModule } from '@nestjs/passport';
     MailService, 
     OtpService, 
     JwtService,
+    RefreshtokenService,
   ],
 })
 export class AuthModule {}
