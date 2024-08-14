@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+enum Status {
+  inactive  
+  active
+}
+
+enum Currency {
+  uzs
+  usd
+}
+
+enum PaymentMethod {
+  cash
+  card
+}
+
+model Users {
+  id        String   @id @default(uuid())
+  fullname  String
+  email     String   @unique
+  password  String
+  phone     String
+  status    Status   @default(inactive)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Drivers {
+  id        String   @id @default(uuid())
+  fullname  String
+  email     String   @unique
+  password  String
+  phone     String
+  avatarUrl String
+  rating    Int      @default(0)
+  status    Status   @default(inactive)
+  car_model String
+  car_name  String
+  car_type  String
+
+  @@map("drivers")
+}
+
+model Admins {
+  id        String   @id @default(uuid())
+  fullname  String
+  email     String   @unique
+  password  String
+  status    Status   @default(inactive)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Trips {
+  id         String   @id @default(uuid())
+  start_time DateTime
+  end_time   DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Orders Orders[]
+
+  @@map("trips")
+}
+
+model Payments {
+  id             String        @id @default(uuid())
+  amount         Int
+  currency       Currency      @default(uzs)
+  payment_method PaymentMethod @default(cash)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  Orders Orders[]
+
+  @@map("payments")
+}
+
+model Ratings {
+  id        String   @id @default(uuid())
+  score     String
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Orders Orders[]
+
+  @@map("ratings")
+}
+
+model Orders {
+  id         String   @id @default(uuid())
+  user_id    String
+  driver_id  String
+  start_dir  String
+  end_dir    String
+  status     String   @default("pending")
+  date       DateTime @default(now())
+  trip_id    String
+  payment_id String
+  rating_id  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  trip    Trips    @relation(fields: [trip_id], references: [id])
+  payment Payments @relation(fields: [payment_id], references: [id])
+  rating  Ratings  @relation(fields: [rating_id], references: [id])
+
+  @@map("orders")
+}
+
+model Otps {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("otps")
+}
+
+model RefreshTokens {
+  id        String   @id @default(uuid())
+  email     String
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("refreshtokens")
+}
+
