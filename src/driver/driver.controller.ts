@@ -1,34 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DriverService } from './driver.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
+import { JwtAuthGuard } from 'src/auth/common/guards';
+import { Roles } from 'src/auth/common/decorators/role.decorator';
+import { Role } from 'src/auth/common/types/role.enum';
+import { RolesGuard } from 'src/auth/common/guards/role.guard';
 
 @Controller('driver')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
-  @Post()
-  create(@Body() createDriverDto: CreateDriverDto) {
-    return this.driverService.create(createDriverDto);
-  }
-
-  @Get()
+  @Get("all")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
   findAll() {
     return this.driverService.findAll();
   }
 
-  @Get(':id')
+
+  @Get('one/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
   findOne(@Param('id') id: string) {
-    return this.driverService.findOne(+id);
+    return this.driverService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDriverDto: UpdateDriverDto) {
-    return this.driverService.update(+id, updateDriverDto);
+  @Patch('one/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateDriverDto) {
+    return this.driverService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('one/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
   remove(@Param('id') id: string) {
-    return this.driverService.remove(+id);
+    return this.driverService.remove(id);
   }
 }

@@ -10,6 +10,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { AccessTokenStrategy } from './auth/common/strategies';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -26,16 +28,18 @@ import { JwtModule } from '@nestjs/jwt';
       global: true,
     }),
 
+    PassportModule,
     AdminModule,
     UserModule, 
     DriverModule, 
     OrderModule, 
     RatingModule, 
-    AuthModule
+    AuthModule,
   ],
   controllers: [],
   providers: [
-    PrismaService
+    PrismaService,
+    AccessTokenStrategy
   ],
 })
 export class AppModule { }

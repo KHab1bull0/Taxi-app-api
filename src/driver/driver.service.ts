@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class DriverService {
-  create(createDriverDto: CreateDriverDto) {
-    return 'This action adds a new driver';
+  constructor(
+    private readonly prisma: PrismaService
+  ) { }
+
+  async findAll() {
+    try {
+      return await this.prisma.drivers.findMany();
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 
-  findAll() {
-    return `This action returns all driver`;
+  async findOne(id: string) {
+    try {
+      return await this.prisma.drivers.findFirst({ where: { id: id } })
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} driver`;
+  async update(id: string, updateUserDto: UpdateDriverDto) {
+    try {
+      const newUser = await this.prisma.drivers.update({ data: updateUserDto, where: { id: id } });
+      return { message: "Driver updated", newUser: newUser };
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 
-  update(id: number, updateDriverDto: UpdateDriverDto) {
-    return `This action updates a #${id} driver`;
-  }
+  async remove(id: string) {
+    try {
+      const deleteUser = await this.prisma.drivers.delete({ where: { id: id } });
+      return { message: "Driver deleted", deletedUser: deleteUser };
 
-  remove(id: number) {
-    return `This action removes a #${id} driver`;
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 }

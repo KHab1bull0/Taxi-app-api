@@ -152,7 +152,6 @@ export class AuthService {
     } else if (role === 'driver') {
       user = await this.prisma.drivers.findFirst({ where: { email: email } });
     }
-    console.log(user);
 
     if (!user) {
       throw new Error(`${role.toUpperCase()} not found`);
@@ -229,7 +228,6 @@ export class AuthService {
 
   async getProfile(email: string, role: string) {
     try {
-      console.log(email, role);
 
       if (role === 'user') {
         const user = await this.prisma.users.findFirst({ where: { email: email } });

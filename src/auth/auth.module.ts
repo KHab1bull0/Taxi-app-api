@@ -12,7 +12,6 @@ import { PassportModule } from '@nestjs/passport';
 @Module({
   imports: [
     HelperModule,
-    PassportModule
   ],
   controllers: [AuthController],
   providers: [
@@ -21,7 +20,6 @@ import { PassportModule } from '@nestjs/passport';
     MailService, 
     OtpService, 
     JwtService,
-    AccessTokenStrategy
   ],
 })
 export class AuthModule {}

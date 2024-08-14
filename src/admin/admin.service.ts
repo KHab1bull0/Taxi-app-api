@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
+  constructor(
+    private readonly prisma: PrismaService
+  ) { }
+
+  async findAll() {
+    try {
+      return await this.prisma.admins.findMany();
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 
-  findAll() {
-    return `This action returns all admin`;
+  async findOne(id: string) {
+    try {
+      return await this.prisma.admins.findFirst({ where: { id: id } })
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  async update(id: string, updateUserDto: UpdateAdminDto) {
+    try {
+      const newUser = await this.prisma.admins.update({ data: updateUserDto, where: { id: id } });
+      return { message: "Admin updated", newUser: newUser };
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
-  }
+  async remove(id: string) {
+    try {
+      const deleteUser = await this.prisma.admins.delete({ where: { id: id } });
+      return { message: "Admin deleted", deletedUser: deleteUser };
 
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+    } catch (e) {
+      console.log(e);
+      return { error: e }
+    };
   }
 }
