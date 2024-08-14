@@ -12,6 +12,9 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from './auth/common/strategies';
 import { PassportModule } from '@nestjs/passport';
+import { OtpModule } from './otp/otp.module';
+import { WalletModule } from './wallet/wallet.module';
+import { RefreshtokenModule } from './refreshtoken/refreshtoken.module';
 
 @Module({
   imports: [
@@ -30,11 +33,14 @@ import { PassportModule } from '@nestjs/passport';
 
     PassportModule,
     AdminModule,
-    UserModule, 
-    DriverModule, 
-    OrderModule, 
-    RatingModule, 
+    UserModule,
+    DriverModule,
+    OrderModule,
+    RatingModule,
     AuthModule,
+    OtpModule,
+    WalletModule,
+    RefreshtokenModule,
   ],
   controllers: [],
   providers: [

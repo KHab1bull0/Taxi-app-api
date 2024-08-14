@@ -123,6 +123,7 @@ export class AuthService {
 
   async login(signinDto: SigninDto, role: string) {
     try {
+
       const validUser = await this.validateUser(signinDto.email, signinDto.password, role);
 
       const payload = { email: validUser.email, role: role };
@@ -154,7 +155,7 @@ export class AuthService {
     }
 
     if (!user) {
-      throw new Error(`${role.toUpperCase()} not found`);
+      throw { message: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND }
     }
 
     if (user && (await this.hash.comparePasswords(pass, user.password))) {
@@ -231,21 +232,30 @@ export class AuthService {
 
       if (role === 'user') {
         const user = await this.prisma.users.findFirst({ where: { email: email } });
-
+        if (!user) {
+          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
+        }
         const { password, ...result } = user
         return result
 
       } else if (role === 'admin') {
         const user = await this.prisma.admins.findFirst({ where: { email: email } });
+        if (!user) {
+          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
+        }
         const { password, ...result } = user
         return result
 
       } else if (role === 'driver') {
         const user = await this.prisma.drivers.findFirst({ where: { email: email } });
+        if (!user) {
+          return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
+        }
         const { password, ...result } = user
         return result
+        
       }
-      return 'undefined';
+      return undefined;
 
     } catch (e) {
       console.log(e);

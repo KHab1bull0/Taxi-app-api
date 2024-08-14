@@ -11,7 +11,8 @@ export class UserService {
 
   async findAll() {
     try {
-      return await this.prisma.users.findMany();
+      const users =  await this.prisma.users.findMany();
+      return {message: "Ok",  status: HttpStatus.OK, users: users};
     } catch (e) {
       console.log(e);
       return { error: e }
@@ -22,9 +23,9 @@ export class UserService {
     try {
       const user =  await this.prisma.users.findFirst({ where: { id: id } })
       if(!user){
-        return {message: "User not found", status: HttpStatus.NOT_FOUND};
+        return {message: "USER not found", status: HttpStatus.NOT_FOUND};
       }
-      return user
+      return { message: "Ok",  status: HttpStatus.OK, user: user};
 
     } catch (e) {
       console.log(e);
@@ -36,11 +37,11 @@ export class UserService {
     try {
       const user =  await this.prisma.users.findFirst({ where: { id: id } })
       if(!user){
-        return {message: "User not found", status: HttpStatus.NOT_FOUND};
+        return {message: "USER not found", status: HttpStatus.NOT_FOUND};
       }
 
       const newUser = await this.prisma.users.update({ data: updateUserDto, where: { id: id } });
-      return { message: "User updated", newUser: newUser };
+      return { message: "User updated", status: HttpStatus.OK,  newUser: newUser };
 
     } catch (e) {
       console.log(e);
@@ -52,11 +53,11 @@ export class UserService {
     try {
       const user =  await this.prisma.users.findFirst({ where: { id: id } })
       if(!user){
-        return {message: "User not found", status: HttpStatus.NOT_FOUND};
+        return {message: "USER not found", status: HttpStatus.NOT_FOUND};
       }
-      
-      const deleteUser = await this.prisma.users.delete({ where: { id: id } });
-      return { message: "User deleted", deletedUser: deleteUser };
+      const deleteUser = await this.prisma.users.delete({ where: { email: user.email } });
+      const userOtp = await this.prisma.otps.delete({where: {email: user.email}});
+      return { message: "User deleted", status: HttpStatus.OK, deletedOtp: true,  deletedUser: deleteUser };
 
     } catch (e) {
       console.log(e);
