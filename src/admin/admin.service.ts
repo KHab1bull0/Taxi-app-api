@@ -11,11 +11,11 @@ export class AdminService {
 
   async findAll() {
     try {
-      const admin =  await this.prisma.admins.findMany();
-      return {status: HttpStatus.OK, admin}
+      const admin = await this.prisma.admins.findMany();
+      return { status: HttpStatus.OK, admin }
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -25,10 +25,10 @@ export class AdminService {
       if (!admin) {
         return { message: "ADMIN not found", status: HttpStatus.NOT_FOUND };
       }
-      return {status: HttpStatus.OK, admin}
+      return { status: HttpStatus.OK, admin }
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -43,7 +43,7 @@ export class AdminService {
       return { message: "ADMIN updated", status: HttpStatus.OK, newUser: newUser };
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 
@@ -59,7 +59,7 @@ export class AdminService {
 
     } catch (e) {
       console.log(e);
-      return { error: e }
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
     };
   }
 }

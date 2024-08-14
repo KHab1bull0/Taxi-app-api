@@ -19,11 +19,11 @@ export class RefreshtokenController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.refreshtokenService.findOne(+id);
+    return this.refreshtokenService.findOne(id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.refreshtokenService.remove(+id);
+    return this.refreshtokenService.remove(id);
   }
 }
