@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateDriverDto } from './create-driver.dto';
+import { SignupDriverDto } from 'src/auth/dto/driver/signupDriver.dto';
 
-export class UpdateDriverDto extends PartialType(CreateDriverDto) {}
+export class UpdateDriverDto extends PartialType(SignupDriverDto) {}

@@ -30,7 +30,7 @@ export class AuthController {
   @Post('driver/signup')
   @UseInterceptors(FileInterceptor('avatarUrl', { storage: multerOptions.storage }))
   createDriver(@UploadedFile() file: Express.Multer.File, @Body() signupDriverDto: SignupDriverDto) {
-   
+
     if (!file) {
       return new HttpException('Fayl yuborilmadi', HttpStatus.BAD_REQUEST);
     }
@@ -106,6 +106,4 @@ export class AuthController {
     const user = await this.authService.refreshToken(email, role);
     return user
   }
-
-
 }

@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { DriverService } from './driver.service';
-import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
 import { JwtAuthGuard } from 'src/auth/common/guards';
 import { Roles } from 'src/auth/common/decorators/role.decorator';
@@ -39,4 +38,27 @@ export class DriverController {
   remove(@Param('id') id: string) {
     return this.driverService.remove(id);
   }
+
+  @Get('currentorders')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
+  async showCurrentOrders() {
+    return await this.driverService.showCurrentOrders();
+  }
+
+  @Get('getOrder/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
+  async getOrder(@Req() req, @Param("id") id: string) {
+    const { email } = req.user
+    return this.driverService.getOrder(id, email);
+  }
+
+  @Get('getOrder/client/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
+  async getOrderClient(@Param() id: string){
+    return await this.driverService.getOrderClient(id);
+  }
+
 }

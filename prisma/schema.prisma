@@ -28,6 +28,14 @@ enum PaymentMethod {
   card
 }
 
+enum OrderStatus {
+  pending
+  accepted
+  delivery
+  cenceled
+  completed
+}
+
 model Users {
   id           String         @id @default(uuid())
   fullname     String
@@ -43,19 +51,28 @@ model Users {
 }
 
 model Drivers {
-  id        String @id @default(uuid())
+  id        String   @id @default(uuid())
   fullname  String
-  email     String @unique
+  email     String   @unique
   password  String
   phone     String
   avatarUrl String
-  rating    Int    @default(0)
-  status    Status @default(inactive)
+  rating    Int      @default(0)
+  status    Status   @default(inactive)
   car_model String
   car_name  String
   car_type  String
+  Wallet    Wallet[]
 
   @@map("drivers")
+}
+
+model Wallet {
+  id        String @id @default(uuid())
+  driver_id String
+  amount    Int
+
+  driver Drivers @relation(fields: [driver_id], references: [id])
 }
 
 model Admins {
@@ -70,71 +87,35 @@ model Admins {
   @@map("admins")
 }
 
-model Trips {
-  id         String   @id @default(uuid())
-  start_time DateTime
-  end_time   DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  Orders Orders[]
-
-  @@map("trips")
-}
-
-model Payments {
-  id             String        @id @default(uuid())
-  amount         Int
-  currency       Currency      @default(uzs)
-  payment_method PaymentMethod @default(cash)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-  Orders Orders[]
-
-  @@map("payments")
-}
-
-model Ratings {
-  id        String   @id @default(uuid())
-  score     String
-  comment   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Orders Orders[]
-
-  @@map("ratings")
-}
-
 model CurrentOrder {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   start_dir String
   end_dir   String
   user_id   String
   amount    Float
-  currency  Currency @default(uzs)
+  status    OrderStatus @default(pending)
+  currency  Currency    @default(uzs)
 
   user Users @relation(fields: [user_id], references: [id])
 }
 
 model Orders {
-  id         String   @id @default(uuid())
-  user_id    String
-  driver_id  String
-  start_dir  String
-  end_dir    String
-  status     String   @default("pending")
-  date       DateTime @default(now())
-  trip_id    String
-  payment_id String
-  rating_id  String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  trip    Trips    @relation(fields: [trip_id], references: [id])
-  payment Payments @relation(fields: [payment_id], references: [id])
-  rating  Ratings  @relation(fields: [rating_id], references: [id])
+  id          String      @id @default(uuid())
+  currento_id String
+  user_id     String
+  driver_id   String
+  start_dir   String
+  end_dir     String
+  status      OrderStatus @default(accepted)
+  date        DateTime    @default(now())
+  start_time  DateTime
+  end_time    DateTime
+  amount      Int
+  currency    Currency    @default(uzs)
+  score       Int         @default(0)
+  comment     String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@map("orders")
 }

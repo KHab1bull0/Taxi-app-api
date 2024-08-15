@@ -99,7 +99,7 @@ export class AuthService {
 
       signupDriverDto.password = await this.hash.hashPassword(signupDriverDto.password);
 
-      const newUser = await this.prisma.drivers.create({
+      const newDriver = await this.prisma.drivers.create({
         data: signupDriverDto
       });
 
@@ -109,11 +109,16 @@ export class AuthService {
       });
 
       this.mail.sendMail(email, 'Token', number)
-
+      this.prisma.wallet.create({
+        data: {
+          driver_id: newDriver.id,
+          amount: 0
+        }
+      });
       return {
         status: HttpStatus.OK,
         sendOtp: true,
-        newAdmin: newUser
+        newAdmin: newDriver
       }
 
     } catch (e) {
@@ -218,7 +223,7 @@ export class AuthService {
           return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
         }
         const { password, ...result } = user
-        return {status: HttpStatus.OK, result}
+        return { status: HttpStatus.OK, result }
 
       } else if (role === 'admin') {
         const user = await this.prisma.admins.findFirst({ where: { email: email } });
@@ -226,7 +231,7 @@ export class AuthService {
           return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
         }
         const { password, ...result } = user
-        return {status: HttpStatus.OK, result}
+        return { status: HttpStatus.OK, result }
 
       } else if (role === 'driver') {
         const user = await this.prisma.drivers.findFirst({ where: { email: email } });
@@ -234,7 +239,7 @@ export class AuthService {
           return { messages: `${role.toUpperCase()} not found`, status: HttpStatus.NOT_FOUND };
         }
         const { password, ...result } = user
-        return {status: HttpStatus.OK, result}
+        return { status: HttpStatus.OK, result }
 
       }
 

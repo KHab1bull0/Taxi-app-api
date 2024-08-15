@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CommentDto } from './dto/comment.dto';
 import { JwtAuthGuard } from 'src/auth/common/guards';
 import { Role } from 'src/auth/common/types/role.enum';
 import { Roles } from 'src/auth/common/decorators/role.decorator';
@@ -29,7 +28,7 @@ export class UserController {
   @Patch('one/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.User, Role.Admin)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: string, @Body() updateUserDto: any) {
     return this.userService.update(id, updateUserDto);
   }
 
@@ -38,5 +37,12 @@ export class UserController {
   @Roles(Role.User, Role.Admin)
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  @Post('one/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.User, Role.Admin)
+  async addComment(@Param('id') id: string, @Body() body: CommentDto) {
+    return this.userService.addComment(id, body);
   }
 }

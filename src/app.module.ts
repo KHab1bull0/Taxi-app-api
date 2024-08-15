@@ -3,7 +3,6 @@ import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { DriverModule } from './driver/driver.module';
 import { OrderModule } from './order/order.module';
-import { RatingModule } from './rating/rating.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaService } from 'prisma/prisma.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -15,6 +14,7 @@ import { PassportModule } from '@nestjs/passport';
 import { OtpModule } from './otp/otp.module';
 import { WalletModule } from './wallet/wallet.module';
 import { RefreshtokenModule } from './refreshtoken/refreshtoken.module';
+import { CurrentorderModule } from './currentorder/currentorder.module';
 
 @Module({
   imports: [
@@ -36,11 +36,11 @@ import { RefreshtokenModule } from './refreshtoken/refreshtoken.module';
     UserModule,
     DriverModule,
     OrderModule,
-    RatingModule,
     AuthModule,
     OtpModule,
     WalletModule,
     RefreshtokenModule,
+    CurrentorderModule,
   ],
   controllers: [],
   providers: [
