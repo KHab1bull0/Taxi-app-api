@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    container_name: my-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rooter
+      POSTGRES_DB: mydatabase
+    ports:
+      - "7000:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://postgres:rooter@db:5432/postgres
+    depends_on:
+      - db
+    ports:
+      - "4004:4000"
+
+volumes:
+  postgres_data:
