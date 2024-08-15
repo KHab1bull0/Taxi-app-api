@@ -67,7 +67,6 @@ export class UserService {
 
   async addComment(id: string, body: CommentDto) {
     try {
-
       const order = await this.prisma.orders.findFirst({ where: { id: id } });
       if (!order) {
         return { message: "ORDER not found", status: HttpStatus.NOT_FOUND };

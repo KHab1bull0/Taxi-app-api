@@ -39,7 +39,7 @@ export class UserController {
     return this.userService.remove(id);
   }
 
-  @Post('one/:id')
+  @Post('comment/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.User, Role.Admin)
   async addComment(@Param('id') id: string, @Body() body: CommentDto) {

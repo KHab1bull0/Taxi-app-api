@@ -112,8 +112,9 @@ export class DriverService {
       };
 
       const ordercreated = await this.prisma.orders.create({ data: newOrder });
-      const currentorder = await this.prisma.currentOrder.delete({ where: { id: id } });
-      return { message: "Order accepted", status: HttpStatus.OK, currentOrderDeleted: true, order: ordercreated };
+      // const currentorder = await this.prisma.currentOrder.delete({ where: { id: id } });
+      return { message: "Order accepted", status: HttpStatus.OK, order: ordercreated };
+       
 
     } catch (e) {
       console.log(e);
@@ -148,6 +149,16 @@ export class DriverService {
       const complretedorder = await this.prisma.orders.update({ data: { status: status, end_time: new Date() }, where: { id: id } });
 
       return { message: "Order competed", status: HttpStatus.OK, complretedorder };
+    } catch (e) {
+      console.log(e);
+      return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }
+    }
+  }
+
+  async showorders(email: string) {
+    try {
+      const driver = await this.prisma.drivers.findFirst({ where: { email: email } })
+      return await this.prisma.orders.findMany({ where: { driver_id: driver.id } });
     } catch (e) {
       console.log(e);
       return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }

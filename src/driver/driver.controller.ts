@@ -57,8 +57,17 @@ export class DriverController {
   @Get('getOrder/client/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Driver, Role.Admin)
-  async getOrderClient(@Param() id: string){
+  async getOrderClient(@Param("id") id: string) {
+    
     return await this.driverService.getOrderClient(id);
+  }
+
+  @Get('orders')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Driver, Role.Admin)
+  async showOrders(@Req() req) {
+    const { email } = req.user;
+    return await this.driverService.showorders(email);
   }
 
 }
