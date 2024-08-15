@@ -18,7 +18,7 @@ export class CurrentorderController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin, Role.User)
-  create(@Req() req: Request, @Body() createCurrentorderDto: CreateCurrentorderDto) {
+  create(@Req() req, @Body() createCurrentorderDto: CreateCurrentorderDto) {
     return this.currentorderService.create(createCurrentorderDto, req);
   }
 

@@ -16,7 +16,6 @@ export class AuthController {
     private readonly authService: AuthService
   ) { }
 
-
   @Post('admin/signup')
   createAdmin(@Body() signupAdminDto: SignupAdminDto) {
     return this.authService.signupAdmin(signupAdminDto);

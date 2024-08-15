@@ -41,7 +41,7 @@ export class AuthService {
         data: { email: email, otp: number }
       });
 
-      this.mail.sendMail(email, 'Token', number)
+      this.mail.sendMail(email, 'Otp', number)
 
       return {
         sendOtp: true,
@@ -69,18 +69,18 @@ export class AuthService {
         data: signupUserDto
       });
 
-      const number = this.otp.generateOtp(6)
+      const number = this.otp.generateOtp(6);
       const otp = await this.prisma.otps.create({
         data: { email: email, otp: number }
       });
 
-      this.mail.sendMail(email, 'Token', number)
+      this.mail.sendMail(email, 'Otp', number);
 
       return {
         status: HttpStatus.OK,
         sendOtp: true,
         newAdmin: newUser
-      }
+      };
 
     } catch (e) {
       console.log(e);
@@ -108,7 +108,7 @@ export class AuthService {
         data: { email: email, otp: number }
       });
 
-      this.mail.sendMail(email, 'Token', number)
+      this.mail.sendMail(email, 'Otp', number)
       this.prisma.wallet.create({
         data: {
           driver_id: newDriver.id,
@@ -139,6 +139,7 @@ export class AuthService {
         accessToken: access,
         refreshToken: refresh
       }
+      
     } catch (e) {
       console.log(e);
       return { error: e, status: HttpStatus.INTERNAL_SERVER_ERROR }

@@ -73,6 +73,8 @@ model Wallet {
   amount    Int
 
   driver Drivers @relation(fields: [driver_id], references: [id])
+
+  @@map("wallets")
 }
 
 model Admins {
@@ -97,6 +99,8 @@ model CurrentOrder {
   currency  Currency    @default(uzs)
 
   user Users @relation(fields: [user_id], references: [id])
+
+  @@map("currentorders")
 }
 
 model Orders {

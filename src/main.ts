@@ -15,3 +15,5 @@ async function bootstrap() {
   });
 }
 bootstrap();
+
+// ts config alias

@@ -108,7 +108,7 @@ export class DriverService {
         amount: Math.round(order.amount),
         currency: Currency.uzs,
         score: 0,
-        comment: "blabal"
+        comment: "blabla"
       };
 
       const ordercreated = await this.prisma.orders.create({ data: newOrder });
